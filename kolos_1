@@ -145,7 +145,7 @@ class Lista_2k_2w:
 
 
     def szykaj_zwraca_nr_elementu(self, x: str):
-        # zwraca jeden lub kilka numerow indeksu na ktorych sa wartosci 'x'
+        # zwraca jeden lub kilka numerow indeksu na ktorych sa wartosci 'x' w tablicy
         li = self.przed_pie.nast
         y = 0
         list =[]
