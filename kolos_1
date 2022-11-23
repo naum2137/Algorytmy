@@ -1,0 +1,260 @@
+from typing import Any, Callable
+
+
+class ListaWpis:
+    wart: str
+    nast: 'ListaWpis'
+    poprz: 'ListaWpis'
+
+    def __init__(self, wart: str = '', nast: 'ListaWpis' = None, poprz: 'ListaWpis' = None):
+        self.wart = wart
+        self.nast = nast
+        self.poprz = poprz
+
+
+    def dodaj_po_nim(self, wart: Any) -> None:
+        wenz = ListaWpis(wart)
+
+        wenz.nast = self.nast
+        self.nast.poprz = wenz
+        wenz.poprz = self
+        self.nast = wenz
+
+
+    def dodaj_przed_nim(self, wart: Any) -> None:
+        wenz = ListaWpis(wart)
+        wenz.poprz = self.poprz
+        wenz.nast = self
+        self.poprz.nast = wenz
+        self.poprz = wenz
+
+    def usun_el(self):
+        #omija self
+        self.nast.poprz = self.nast.poprz.poprz
+        self.poprz.nast = self.poprz.nast.nast
+
+
+class Lista_2k_2w:
+    def __init__(self):
+        self.za_ost = ListaWpis(None)
+        self.przed_pie = ListaWpis(None)
+
+        self.przed_pie.nast = self.za_ost
+        self.za_ost.poprz = self.przed_pie
+
+
+    def pobierz_el(self,idx: int) -> ListaWpis:
+
+        if idx >= 0:
+            li = self.przed_pie.nast
+            x = 0
+            while li is not self.za_ost:
+                if idx == x:
+                    return li
+                x += 1
+                li = li.nast
+
+        elif idx < 0:
+            li = self.za_ost.poprz
+            x = -1
+            while li is not self.przed_pie:
+                if idx == x:
+                    return li
+                x -= 1
+                li = li.poprz
+
+
+    def dodaj_za_koniec(self, wart: Any):
+        wenz = ListaWpis(wart)
+        wenz.nast = self.za_ost
+        wenz.poprz = self.za_ost.poprz
+        self.za_ost.poprz.nast = wenz
+        self.za_ost.poprz = wenz
+
+
+
+
+
+    def dodaj_przed_poczatkiem(self, wart: Any):
+        wenz = ListaWpis(wart)
+        wenz.nast = self.przed_pie.nast
+        wenz.poprz = self.przed_pie
+        self.przed_pie.nast = wenz
+        self.przed_pie.nast.poprz = wenz
+
+
+    def usun_pierwszy(self) -> str:
+        if self.przed_pie is self.za_ost.poprz:
+            return 'Lista jest pusta'
+        pom = self.przed_pie.nast
+        self.przed_pie.nast = self.przed_pie.nast.nast
+        self.przed_pie.nast.poprz = self.przed_pie
+        return pom.wart
+
+
+    def usun_ostatni(self) -> str:
+        if self.za_ost is self.przed_pie:
+            return 'Lista jest pusta'
+        pom = self.za_ost.poprz
+        self.za_ost.poprz = self.za_ost.poprz.poprz
+        self.za_ost.poprz.nast = self.za_ost
+        return pom.wart
+
+
+    def podaj_dlugosc(self) -> int:
+        li = self.przed_pie.nast
+        x = 0
+        while li is not self.za_ost:
+            x += 1
+            li = li.nast
+        return x
+
+
+    def odwroc(self) -> 'Lista_2k_2w':
+        nowa = Lista_2k_2w()
+        li = self.za_ost.poprz
+        while li is not self.przed_pie:
+            nowa.dodaj_za_koniec(li.wart)
+            li = li.poprz
+        return nowa
+
+
+    def obrob_wartosci(self, funkcja: Callable[[str], str]):
+        li = self.przed_pie.nast
+        while li is not self.za_ost:
+            li.wart = funkcja(li.wart)
+            li = li.nast
+
+
+    def print(self):
+        li = self.przed_pie.nast
+        if self.przed_pie.nast is self.za_ost.poprz:
+            print('Lista jest pusta')
+        else:
+            lista = ''
+            while li is not self.za_ost:
+                lista += li.wart
+                if li is not self.za_ost.poprz:
+                    lista += '<>'
+                li = li.nast
+            print(lista)
+
+
+
+    # --------dodatkowe----------
+
+
+    def szykaj_zwraca_nr_elementu(self, x: str):
+        # zwraca jeden lub kilka numerow indeksu na ktorych sa wartosci 'x'
+        li = self.przed_pie.nast
+        y = 0
+        list =[]
+        while li is not self.za_ost:
+            if li.wart is x:
+                list.append(y)
+            li = li.nast
+            y += 1
+        if len(list) == 0:
+            return print('elementu nie ma na liscie')
+        else:
+            return print(list)
+
+
+    def szukaj_zwraca_wartosc(self, x: str):
+        # zwraca jeden lub kilka wartosci takich jak 'x' w  tablicy
+        li = self.przed_pie.nast
+        list = []
+        while li is not self.za_ost:
+            if li.wart is x:
+                list.append(li.wart)
+            li = li.nast
+        if len(list) == 0:
+            return print('nie ma takich wartosci')
+        else:
+            return print(list)
+
+
+    def usun_wszystko(self):
+        # usuwa wszystkie elementy
+        # nie wiem jak to działa ale działa ;D
+        self.przed_pie.nast = self.za_ost.poprz
+        self.za_ost.poprz = self.przed_pie.nast
+
+
+    def usun_el_o_danej_wart(self, x: str):
+        # literuje od poczatku
+        li = self.przed_pie.nast
+        while li is not self.za_ost:
+            if li.wart is x:
+                li.usun_el()
+            li = li.nast
+
+    def usun_el_o_danej_wart_odtylu(self, x: str):
+        #literuje od konca
+        li = self.za_ost.poprz
+        while li is not self.przed_pie:
+            if li.wart is x:
+                li.usun_el()
+            li = li.poprz
+
+
+    def szukaj(self, x: str) -> ListaWpis:
+        # zwraca adres bramy tylko pierwszej wartosci zgodnego z 'x'
+        li = self.przed_pie.nast
+        while li is not self.za_ost:
+            if li.wart is x:
+                return li
+            li = li.nast
+
+
+
+
+
+
+a = Lista_2k_2w()
+a.dodaj_za_koniec('krzysiak')
+a.za_ost.dodaj_przed_nim('chuj')
+a.dodaj_za_koniec('2')
+a.za_ost.dodaj_przed_nim('1')
+a.dodaj_za_koniec('3')
+a.dodaj_za_koniec('7')
+a.dodaj_za_koniec('2')
+
+print(a.podaj_dlugosc())
+a.print()
+
+a.szykaj_zwraca_nr_elementu('2')
+a.szukaj_zwraca_wartosc('2')
+# a.usun_wszystko()
+a.usun_el_o_danej_wart('krzysiak')
+a.usun_el_o_danej_wart('chuj')
+a.print()
+print(a.szukaj('2'))
+print(a.szukaj('2').wart)
+a.usun_el_o_danej_wart_odtylu('3')
+a.print()
+
+a.dodaj_przed_poczatkiem('0')
+a.print()
+a.usun_pierwszy()
+a.print()
+a.usun_ostatni()
+a.print()
+# print(a.podaj_dlugosc())
+# a.print()
+a.odwroc().print()
+#
+#
+# def dodaj_plusik(ciag) -> str:
+#     return ciag + '+'
+#
+#
+# print(a.pobierz_el(-2).wart)
+# a.obrob_wartosci(dodaj_plusik)
+# a.print()
+# a.przed_pie.dodaj_po_nim('1')
+# a.za_ost.dodaj_przed_nim('2')
+# a.za_ost.dodaj_przed_nim('3')
+# a.przed_pie.dodaj_po_nim('4')
+# a.za_ost.dodaj_przed_nim('5')
+# a.print()
